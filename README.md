@@ -36,6 +36,8 @@ The project implements **Face Recognition** and **Face Anti Spoofing** on **Rasp
 
 - The performance of detecting people who wearing a mask can be improved when retinaface is used as the Detector(TODO). 
 
+- The number in cyan indicates the score for face recognition, and the number in yellow shows the confidence of live estimation. 
+
 ---
 
 ## Dependency

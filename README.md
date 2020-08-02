@@ -63,7 +63,7 @@ The project implements **Face Recognition** and **Face Anti Spoofing** on **Rasp
 
 ## Run
 
-make sure you have change  `project_path` to your own
+make sure you have changed  `project_path` to your own
 
 ```shell
 mkdir build

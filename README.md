@@ -8,6 +8,11 @@ Face recognition and live estimation on Raspberry Pi 4B with average FPS around 
 
 The project implements **Face Recognition** and **Face Anti Spoofing** on **Raspberry pi** with the models transformed to **ncnn**. Besides, the whole project is designed as an **entrance guard system** by reading face images in the img folder and determining whether the input face is in the dataset by **Arcface**. The most interesting function is that it is capable to estimate whether the face getting from the camera is real **just relaying on the input image** instead of with the help of human body sensors or temperature sensors. As a result, it can avoid the situation of deceived by false faces, including printed paper photos, the display screen of electronic products, silicone masks, 3D human images, etc.
 
+
+- Neural Network Inference
+
+  [ncnn](https://github.com/Tencent/ncnn)
+
 - Detection:
 
   [mtcnn](https://kpzhang93.github.io/MTCNN_face_detection_alignment/index.html)
@@ -18,7 +23,7 @@ The project implements **Face Recognition** and **Face Anti Spoofing** on **Rasp
 
 -  Anti-Spoofing:
 
-   [Face-Anti-Spoofing](https://github.com/minivision-ai/Silent-Face-Anti-Spoofing)
+  [Face-Anti-Spoofing](https://github.com/minivision-ai/Silent-Face-Anti-Spoofing)
 
 ---
 

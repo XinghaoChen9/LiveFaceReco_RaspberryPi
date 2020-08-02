@@ -30,9 +30,9 @@ The project implements **Face Recognition** and **Face Anti Spoofing** on **Rasp
 
 ![image](https://github.com/XinghaoChen9/LiveFaceReco_RaspberryPi/blob/master/demo/livedetect.gif)
 
-![image](https://github.com/XinghaoChen9/LiveFaceReco_RaspberryPi/blob/master/demo/mask1.gif)
+![image](https://github.com/XinghaoChen9/LiveFaceReco_RaspberryPi/blob/master/demo/Mask1.gif)
 
-![image](https://github.com/XinghaoChen9/LiveFaceReco_RaspberryPi/blob/master/demo/mask2.gif)
+![image](https://github.com/XinghaoChen9/LiveFaceReco_RaspberryPi/blob/master/demo/Mask2.gif)
 
 - The program was run with 2859 faces in img folder, which is enough for a moderate entrance guard system.  
 

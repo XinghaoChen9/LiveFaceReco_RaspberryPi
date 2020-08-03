@@ -37,9 +37,10 @@ The project implements **Face Recognition** and **Face Anti Spoofing** on **Rasp
 
 - The program was run with 2859 faces in img folder, which is enough for a moderate entrance guard system.  
 
+- There is only one image of me(not wearing a mask) in the database, and it is capable to recognize me when wearing a mask(not robust enough). The performance can be improved when retinaface is used as the Detector(TODO).
+
 - The average FPS is around 20, and it successfully recognized me from the database. 
 
-- The performance of detecting people who wearing a mask can be improved when retinaface is used as the Detector(TODO). 
 
 - The number in cyan indicates the score for face recognition, and the number in yellow shows the confidence of live estimation. 
 

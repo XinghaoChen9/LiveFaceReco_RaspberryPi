@@ -4,6 +4,10 @@
 Face recognition and live estimation on Raspberry Pi 4B with average FPS around 20 and 2800+ faces loaded.
 ```
 
+## **Update**
+
+**`2020-08-26`**: add ncnn libs (ubunutu, arm64-v8a, armeabi-v7a, and RaspberryPi4B ) to include folder
+
 ## Introduction
 
 The project implements **Face Recognition** and **Face Anti Spoofing** on **Raspberry pi** with the models transformed to **ncnn**. Besides, the whole project is designed as an **entrance guard system** by reading face images in the img folder and determining whether the input face is in the dataset by **Arcface**. The most interesting function is that it is capable to estimate whether the face getting from the camera is real **just relaying on the input image** instead of with the help of human body sensors or temperature sensors. As a result, it can avoid the situation of deceived by false faces, including printed paper photos, the display screen of electronic products, silicone masks, 3D human images, etc.
@@ -56,7 +60,7 @@ The project implements **Face Recognition** and **Face Anti Spoofing** on **Rasp
 
 - **OpenCV**
 
-  Building OpenCV in Raspberry Pi might be slightly different from that in other linux systems. If you met some problem, you may find [this website](https://blog.csdn.net/weixin_43287964/article/details/101696036?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task) helpful.
+  Building OpenCV on Raspberry Pi might be slightly different from that in other linux systems. If you met some problem, you may find [this website](https://blog.csdn.net/weixin_43287964/article/details/101696036?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task) helpful.
 
 - 
    **project_path:**

@@ -1,16 +1,20 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
+
 PROJECT(LiveFaceReco)
+
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 message("ncnn path: " ${NCNN_PATH})
 
 
 find_package(OpenCV 4 REQUIRED HINTS ${OpenCV_PATH})
 
-SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ldl -lpthread")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -ldl -lpthread")
+
 
 LINK_DIRECTORIES(${HOME_TVM}/build)
 
@@ -40,11 +44,19 @@ ADD_LIBRARY(facedetect STATIC
 			src/arcface.h
 			src/mtcnn_new.cpp
 			src/mtcnn_new.h
+			src/ParallelVideoCapture/parallel_video_capture.cpp
+			src/ParallelVideoCapture/parallel_video_capture.hpp
+
 )
 
+add_subdirectory(src)
+
+if(${BUILD_TESTS})
+	include(${CMAKE_MODULE_PATH}/Tests.cmake)
+endif()
 
 ADD_EXECUTABLE(LiveFaceReco src/main.cpp)
 
-TARGET_LINK_LIBRARIES(LiveFaceReco ${OpenCV_LIBS}  facedetect ncnn)
+TARGET_LINK_LIBRARIES(LiveFaceReco ${OpenCV_LIBS}  facedetect ncnn ParallelVideoCapture pthread)
 TARGET_LINK_LIBRARIES(facedetect ${OpenCV_LIBS} ncnn)
 

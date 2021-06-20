@@ -1,0 +1,6 @@
+PROJECT(LiveFaceReco)
+
+set(ParallelVideoCapture_SRCS parallel_video_capture.cpp)
+set(ParallelVideoCapture_INCLUDES parallel_video_capture.hpp)
+
+ADD_LIBRARY(ParallelVideoCapture parallel_video_capture.cpp parallel_video_capture.hpp)

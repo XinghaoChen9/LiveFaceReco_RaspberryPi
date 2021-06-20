@@ -1,13 +1,15 @@
 #include "parallel_video_capture.hpp"
 #include <iostream>
-ParallelVideoCapture::ParallelVideoCapture(int index) : cv::VideoCapture(index), running_(false){
+ParallelVideoCapture::ParallelVideoCapture(int index, int fps) : cv::VideoCapture(index), running_(false), fps_(fps){
+    interval_ms_ = 1000/fps;
 }
 
-ParallelVideoCapture::ParallelVideoCapture(const cv::String & filename) : cv::VideoCapture(filename), running_(false){
-    cv::VideoCapture::open(filename);
+ParallelVideoCapture::ParallelVideoCapture(const cv::String & filename, int fps) : cv::VideoCapture(filename), running_(false), fps_(fps){
+    interval_ms_ = 1000/fps;
 }
 
-ParallelVideoCapture::ParallelVideoCapture(const cv::String &filename, int apiPreference) : cv::VideoCapture(filename,apiPreference), running_(false){
+ParallelVideoCapture::ParallelVideoCapture(const cv::String &filename, int apiPreference, int fps) : cv::VideoCapture(filename,apiPreference), running_(false), fps_(fps){
+    interval_ms_ = 1000/fps;
 }
 
 ParallelVideoCapture::~ParallelVideoCapture()

@@ -20,11 +20,11 @@ class ParallelVideoCapture : public cv::VideoCapture
         
         ParallelVideoCapture() = delete;
         
-        ParallelVideoCapture(int index);
+        ParallelVideoCapture(int index, int fps = 30);
         
-        ParallelVideoCapture(const cv::String &filename);
+        ParallelVideoCapture(const cv::String &filename, int fps = 30);
         
-        ParallelVideoCapture(const cv::String &filename, int apiPreference);
+        ParallelVideoCapture(const cv::String &filename, int apiPreference,  int fps = 30);
 
         ~ParallelVideoCapture();
         
@@ -65,7 +65,9 @@ class ParallelVideoCapture : public cv::VideoCapture
 
         cv::Mat frame_;
 
-        uint8_t interval_ms_ = 30;
+        uint8_t fps_;
+
+        uint8_t interval_ms_;
 };
 
 void captureFromSource(ParallelVideoCapture & cap);

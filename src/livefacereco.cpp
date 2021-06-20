@@ -17,6 +17,7 @@
 #include <time.h>
 #include "live.h"
 #include "mtcnn_new.h"
+#include "ParallelVideoCapture/parallel_video_capture.hpp"
 
 #define PI 3.14159265
 using namespace std;
@@ -94,8 +95,6 @@ int MTCNNDetection() {
 
     class Arcface reco;
 
-
-
     // loading faces   
     Mat  faces;
     vector<cv::Mat> fc1;
@@ -125,10 +124,12 @@ int MTCNNDetection() {
        cout <<"loading succeed! "<<image_number<<" pictures in total"<<endl;
 
     int count = 0;
-    VideoCapture cap(0); //using camera capturing
-    cap.set(CAP_PROP_FRAME_WIDTH, input_width);
-    cap.set(CAP_PROP_FRAME_HEIGHT, input_height);
-    cap.set(CAP_PROP_FPS, 90);
+    ParallelVideoCapture cap("/home/luiz/Videos/niver_magina.mp4"); //using camera capturing
+    // cap.set(CAP_PROP_FRAME_WIDTH, input_width);
+    // cap.set(CAP_PROP_FRAME_HEIGHT, input_height);
+    // cap.set(CAP_PROP_FPS, 90);
+    cap.startCapture();
+    //usleep(100000);
     if (!cap.isOpened()) {
         cerr << "cannot get image" << endl;
         return -1;
@@ -160,8 +161,13 @@ int MTCNNDetection() {
     while (1) {
          count++;
          double t = (double) cv::getTickCount();
-         cap >> frame;        
-         cv::flip (frame,frame,1);
+        
+        frame = cap.getFrame();      
+        if(frame.empty())
+        {
+            continue;
+        }  
+         //cv::flip (frame,frame,1);
          resize(frame, result_cnn, frame_size,INTER_LINEAR);
          vector<Bbox> faceInfo = detect_mtcnn(frame);        
          //find the laggest face

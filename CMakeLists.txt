@@ -44,8 +44,6 @@ ADD_LIBRARY(facedetect STATIC
 			src/arcface.h
 			src/mtcnn_new.cpp
 			src/mtcnn_new.h
-			src/ParallelVideoCapture/parallel_video_capture.cpp
-			src/ParallelVideoCapture/parallel_video_capture.hpp
 
 )
 

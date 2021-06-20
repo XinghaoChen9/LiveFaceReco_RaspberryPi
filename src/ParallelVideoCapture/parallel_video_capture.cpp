@@ -1,10 +1,14 @@
 #include "parallel_video_capture.hpp"
+#include <iostream>
+ParallelVideoCapture::ParallelVideoCapture(int index) : cv::VideoCapture(index), running_(false){
+}
 
-ParallelVideoCapture::ParallelVideoCapture(int index) : cv::VideoCapture(index), running_(false){}
+ParallelVideoCapture::ParallelVideoCapture(const cv::String & filename) : cv::VideoCapture(filename), running_(false){
+    cv::VideoCapture::open(filename);
+}
 
-ParallelVideoCapture::ParallelVideoCapture(const cv::String & filename) : cv::VideoCapture(filename), running_(false){}
-
-ParallelVideoCapture::ParallelVideoCapture(const cv::String &filename, int apiPreference) : cv::VideoCapture(filename,apiPreference), running_(false){}
+ParallelVideoCapture::ParallelVideoCapture(const cv::String &filename, int apiPreference) : cv::VideoCapture(filename,apiPreference), running_(false){
+}
 
 ParallelVideoCapture::~ParallelVideoCapture()
 {
@@ -16,6 +20,8 @@ void ParallelVideoCapture::startCapture()
 {
     if(isOpened())
     {
+        running_ = true;
+
         ParallelVideoCapture*  ptr = static_cast<ParallelVideoCapture*> (this);
         
         if(ptr == nullptr)
@@ -35,6 +41,16 @@ void ParallelVideoCapture::startCapture()
 bool ParallelVideoCapture::isRunning() const
 {
     return running_;
+}
+
+bool ParallelVideoCapture::isOpened() const
+{
+    bool opened = cv::VideoCapture::isOpened();
+    if(!opened)
+    {
+        exit(0);
+    }
+    return opened;
 }
 
 uint8_t ParallelVideoCapture::getIntervalMs() const
@@ -63,6 +79,12 @@ bool ParallelVideoCapture::read()
     
     return readed;
 }
+
+bool ParallelVideoCapture::read(cv::OutputArray image)
+{
+    return  cv::VideoCapture::read(image);
+}
+
 bool ParallelVideoCapture::grab()
 {
     bool readed = cv::VideoCapture::grab();
@@ -71,13 +93,18 @@ bool ParallelVideoCapture::grab()
 }
 bool ParallelVideoCapture::retrieve(cv::OutputArray image, int flag)
 {
-    mutex_.lock();
-        bool readed = cv::VideoCapture::retrieve(frame_,flag);
-    mutex_.unlock();
+    bool readed = cv::VideoCapture::retrieve(image,flag);
     
     return readed;
 }
+bool ParallelVideoCapture::retrieve(int flags)
+{
+    mutex_.lock();
+        bool readed = cv::VideoCapture::retrieve(frame_,flags);
+    mutex_.unlock();
 
+    return readed;
+}
 void ParallelVideoCapture::release()
 {
     cv::VideoCapture::release();
@@ -97,14 +124,13 @@ void captureFromSource(ParallelVideoCapture & cap)
     auto start = std::chrono::system_clock::now();
     auto end  = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
     while(cap.isRunning())
     {
         elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
-        if(elapsed.count()<cap.getIntervalMs())
+        auto time_dif = elapsed.count()-cap.getIntervalMs();
+        if(time_dif<0)
         {
-            usleep(1);
+            std::this_thread::sleep_for(std::chrono::milliseconds(abs(time_dif)));
 
             end  = std::chrono::system_clock::now();
             continue;

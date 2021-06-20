@@ -8,7 +8,7 @@
 
 /**
  *  this class overides all 
- *  constructors presents in
+ *  constructors presents and some methods in
  *  cv::VideoCapture class 
  *  https://docs.opencv.org/3.4/d8/dfe/classcv_1_1VideoCapture.html
  *  Also adds some thread features
@@ -33,6 +33,8 @@ class ParallelVideoCapture : public cv::VideoCapture
         void stopCapture();
 
         bool isRunning() const;
+        
+        bool isOpened() const;
 
         friend void captureFromSource(ParallelVideoCapture & cap);
 
@@ -40,11 +42,15 @@ class ParallelVideoCapture : public cv::VideoCapture
 
         bool read(); // thread safe method for read image from src
 
-        bool grab(); 
+        bool read(cv::OutputArray image);
 
-        bool retrieve(cv::OutputArray image, int flag=0); // thread safe method for retrieve image from src
+        bool grab(); // base class method
 
-        void release();
+        bool retrieve(cv::OutputArray image, int flag=0); // base class method
+
+        bool retrieve(int flags=0); // thread safe method for retrieve image from src
+
+        void release(); 
 
         cv::Mat getFrame();
         

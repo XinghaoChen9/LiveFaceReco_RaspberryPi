@@ -23,6 +23,7 @@ void ParallelVideoCapture::startCapture()
     if(isOpened())
     {
         running_ = true;
+        is_capturing_ = false; // waits for grab the first frame to receive true
 
         ParallelVideoCapture*  ptr = static_cast<ParallelVideoCapture*> (this);
         
@@ -33,6 +34,7 @@ void ParallelVideoCapture::startCapture()
 
         thread_ptr_ = std::make_unique<std::thread>(&captureFromSource,std::ref(*ptr));
 
+        waitForCapture();  
     }
     else{
         throw std::ios_base::failure("[ERROR][startCapture()] could not to open the source video\n");
@@ -62,21 +64,21 @@ uint8_t ParallelVideoCapture::getIntervalMs() const
 
 void ParallelVideoCapture::stopCapture()
 {
+    is_capturing_ = false;
+
     if(running_)
     {
         running_ = false;
-    
         // we join the thread to sync it 
         // this will make out stopCapture function wait for the thread exits from it loop
-        thread_ptr_->join(); 
-
+        thread_ptr_->join();    
     }
 
 }
 bool ParallelVideoCapture::read()
 {
     mutex_.lock();
-        bool readed = cv::VideoCapture::read(frame_);
+        bool readed = read(frame_);
     mutex_.unlock();
     
     return readed;
@@ -90,6 +92,8 @@ bool ParallelVideoCapture::read(cv::OutputArray image)
 bool ParallelVideoCapture::grab()
 {
     bool readed = cv::VideoCapture::grab();
+    
+    is_capturing_ = readed;
     
     return readed;
 }
@@ -111,11 +115,17 @@ void ParallelVideoCapture::release()
 {
     cv::VideoCapture::release();
 }
-cv::Mat ParallelVideoCapture::getFrame()
+void ParallelVideoCapture::getFrame(cv::Mat & frame)
 {
     mutex_.lock();
-        cv::Mat img = frame_; // this doesn't invoke any copy constructor
+        frame = frame_.clone(); // we must to copy the image to avoid non deterministic situations
     mutex_.unlock();
+}
+cv::Mat ParallelVideoCapture::getFrame()
+{
+    cv::Mat img;  
+
+    getFrame(img); 
 
     return img;
 
@@ -123,9 +133,11 @@ cv::Mat ParallelVideoCapture::getFrame()
 void captureFromSource(ParallelVideoCapture & cap)
 {
     bool readed = false;
+    
     auto start = std::chrono::system_clock::now();
     auto end  = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout<<"[INFO] starting capture thread\n";
     while(cap.isRunning())
     {
         elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);

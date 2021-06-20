@@ -40,8 +40,6 @@ class ParallelVideoCapture : public cv::VideoCapture
 
         uint8_t getIntervalMs() const;
 
-        bool read(); // thread safe method for read image from src
-
         bool read(cv::OutputArray image);
 
         bool grab(); // base class method
@@ -52,16 +50,41 @@ class ParallelVideoCapture : public cv::VideoCapture
 
         void release(); 
 
+        void getFrame(cv::Mat & frame);
+
         cv::Mat getFrame();
         
+        inline bool isCapturing() const
+        {
+            return is_capturing_;
+        };
+
+        bool waitForCapture() const // this function waits for the thread starting grab images
+        {
+            auto timeout = std::chrono::seconds(5);
+            auto start = std::chrono::system_clock::now();
+            auto end  = std::chrono::system_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+            while (!isCapturing() && elapsed.count()<timeout.count()) 
+            {
+                end  = std::chrono::system_clock::now();
+                
+            }   
+            return isCapturing();
+            
+        }
 
     private:
+
+        bool read(); // thread safe method for read image from src
 
         std::unique_ptr<std::thread> thread_ptr_;
 
         std::mutex mutex_;  
 
         std::atomic<bool> running_;
+
+        std::atomic<bool> is_capturing_;
 
         cv::Mat frame_;
 

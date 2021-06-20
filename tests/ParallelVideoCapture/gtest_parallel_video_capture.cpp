@@ -6,25 +6,17 @@
 // Demonstrate some basic assertions.
 TEST(ParallelVideoCapture, BasicAssertions) {
 
-  ParallelVideoCapture cap(-1);
+  ParallelVideoCapture cap("/home/luiz/Videos/niver_magina.mp4");
   EXPECT_FALSE(cap.isRunning());
-  EXPECT_FALSE(cap.read());
-  EXPECT_FALSE(cap.grab());
-  EXPECT_EQ(cap.getIntervalMs(), 30);
-
-  cv::Mat img;
-  EXPECT_FALSE(cap.retrieve(img));
-  EXPECT_TRUE(cap.open(0));
-  EXPECT_FALSE(cap.read());
+  EXPECT_EQ(cap.getIntervalMs(), 33);
   EXPECT_TRUE(cap.grab());
-  EXPECT_TRUE(cap.retrieve(img));
-  EXPECT_FALSE(img.empty());
+
   EXPECT_FALSE(cap.isRunning());
   EXPECT_TRUE(cap.getFrame().empty());
 
   cap.startCapture(); 
   usleep(1); // make the program sleeps just for the thread start;
-
+  
   EXPECT_TRUE(cap.isRunning());
   EXPECT_FALSE(cap.getFrame().empty());
 

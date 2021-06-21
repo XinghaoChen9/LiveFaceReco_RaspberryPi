@@ -159,7 +159,8 @@ int MTCNNDetection() {
 
 
     while (1) {
-         count++;
+        count++;
+
          double t = (double) cv::getTickCount();
         
         frame = cap.getFrame();      
@@ -197,6 +198,7 @@ int MTCNNDetection() {
 
             //the faces to operate 
             for (int i =  start_la; i <end_la; i++) {
+                std::cout<<start_la<<" "<<end_la<<"\n";
                 float x_   =  faceInfo[i].x1;
                 float y_   =  faceInfo[i].y1;
                 float x2_ =  faceInfo[i].x2;
@@ -227,16 +229,21 @@ int MTCNNDetection() {
  
 
 /****************************jump*****************************************************/                
-                if (count%jump==0){
+                if (count){
                 cv::Mat dst(5, 2, CV_32FC1, v2);
                 memcpy(dst.data, v2, 2 * 5 * sizeof(float));
 
                 cv::Mat m = FacePreprocess::similarTransform(dst, src);
+                cout<<dst<<"\n";
+                cout<<src<<"\n";
                 cv::Mat aligned = frame.clone();
                 cv::warpPerspective(frame, aligned, m, cv::Size(96, 112), INTER_LINEAR);
                 resize(aligned, aligned, Size(112, 112), 0, 0, INTER_LINEAR);
                 
-
+                imshow("aligned face", aligned);
+                std::cout<<"count "<<count<<"\n";
+                cv::waitKey(10000);
+                return 0;
                 //set to 1 if you want to record your image
                 if (record_face) {
                     imshow("aligned face", aligned);

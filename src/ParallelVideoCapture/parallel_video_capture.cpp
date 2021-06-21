@@ -50,10 +50,7 @@ bool ParallelVideoCapture::isRunning() const
 bool ParallelVideoCapture::isOpened() const
 {
     bool opened = cv::VideoCapture::isOpened();
-    if(!opened)
-    {
-        exit(0);
-    }
+    
     return opened;
 }
 

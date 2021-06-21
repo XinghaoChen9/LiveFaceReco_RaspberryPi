@@ -7,7 +7,12 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 message("ncnn path: " ${NCNN_PATH})
 
 
-find_package(OpenCV 4 REQUIRED HINTS ${OpenCV_PATH})
+find_package(OpenCV REQUIRED HINTS /home/luiz/Libraries/opencv_install/share/OpenCV)
+
+message(${OpenCV_PATH})
+
+message("achou opencv? " ${OpenCV_LIBS})
+
 
 SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -36,8 +41,10 @@ find_package(ncnn REQUIRED HINTS ${NCNN_ROOT_PATH}/lib/cmake)
 
 ADD_LIBRARY(facedetect STATIC
 			include/FacePreprocess.h 			
-			src/livefacereco.cpp
+			src/livefacerecov2.cpp
 			src/livefacereco.hpp
+
+			#src/livefacereco.cpp
 			src/live.cpp
 			src/live.h
 			src/arcface.cpp
@@ -57,4 +64,4 @@ ADD_EXECUTABLE(LiveFaceReco src/main.cpp)
 
 TARGET_LINK_LIBRARIES(LiveFaceReco ${OpenCV_LIBS}  facedetect ncnn ParallelVideoCapture pthread)
 TARGET_LINK_LIBRARIES(facedetect ${OpenCV_LIBS} ncnn)
-
+TARGET_INCLUDE_DIRECTORIES(LiveFaceReco PRIVATE ${OpenCV_INCLUDE_DIRS})

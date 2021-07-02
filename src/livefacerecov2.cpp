@@ -23,7 +23,27 @@ double sum_score, sum_fps,sum_confidence;
 
 #define  PROJECT_PATH "/home/luiz/Faculdade/TCC/LiveFaceReco_RaspberryPi";
 
-void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::vector<cv::Mat> & face_descriptors)
+std::vector<std::string> split(const std::string& s, char seperator)
+{
+   std::vector<std::string> output;
+
+    std::string::size_type prev_pos = 0, pos = 0;
+
+    while((pos = s.find(seperator, pos)) != std::string::npos)
+    {
+        std::string substring( s.substr(prev_pos, pos-prev_pos) );
+
+        output.push_back(substring);
+
+        prev_pos = ++pos;
+    }
+
+    output.push_back(s.substr(prev_pos, pos-prev_pos)); // Last word
+
+    return output;
+}
+
+void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv::Mat> & face_descriptors_map)
 {
     const std::string project_path = PROJECT_PATH;
     std::string pattern_jpg = project_path + "/img/*.jpg";
@@ -46,11 +66,14 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::vector<cv::Mat> & 
     //convert to vector and store into fc, whcih is benefical to furthur operation
 	for(auto const & img_name:image_names)
     {
+        auto splitted_string = split(img_name,'/');
+        auto person_name = splitted_string[splitted_string.size()-1];
+        std::cout<<person_name<<"\n";
         face_img = cv::imread(img_name);
 
         cv::Mat face_descriptor = facereco.getFeature(face_img);
-       
-        face_descriptors.push_back(Statistics::zScore(face_descriptor));
+
+        face_descriptors_map[person_name] = Statistics::zScore(face_descriptor);
 
         printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
     }
@@ -144,19 +167,30 @@ cv::Mat alignFaceImage(const cv::Mat & frame, const Bbox & bbox,const cv::Mat & 
     return aligned.clone();
 }
 
-int getClosestFaceDescriptorIdx(std::vector<cv::Mat> disk_face_descriptors, cv::Mat face_descriptor)
+std::string  getClosestFaceDescriptorPersonName(std::map<std::string,cv::Mat> & disk_face_descriptors, cv::Mat face_descriptor)
 {
     vector<double> score_(disk_face_descriptors.size());
+
+    std::vector<std::string> labels;
+
     int i = 0;
+
     for(const auto & disk_descp:disk_face_descriptors)
     {
-        score_[i] = (Statistics::cosineDistance(disk_descp, face_descriptor));
+        score_[i] = (Statistics::cosineDistance(disk_descp.second, face_descriptor));
+        labels.push_back(disk_descp.first);
         i++;
     }
     int maxPosition = max_element(score_.begin(),score_.end()) - score_.begin(); 
-    int pos = score_[maxPosition]>distance_threshold?maxPosition:-1;
+    int pos = score_[maxPosition]>face_thre?maxPosition:-1;
+    std::string person_name = "";
+    if(pos>=0)
+    {
+        person_name = labels[pos];
+    }
     score_.clear();
-    return pos;
+
+    return person_name;
 }
 
 int MTCNNDetection()
@@ -167,7 +201,7 @@ int MTCNNDetection()
     << CV_SUBMINOR_VERSION << endl;
 
     Arcface facereco;
-    std::vector<cv::Mat> disk_face_descriptors;
+    std::map<std::string,cv::Mat> disk_face_descriptors;
     calculateFaceDescriptorsFromDisk(facereco,disk_face_descriptors);
 
     Live live;
@@ -189,10 +223,7 @@ int MTCNNDetection()
 
     float confidence;
     vector<float> fps;
-    static double current;
-    static char string[10];
-    static char string1[10];
-    char buff[10];
+    
     Mat frame;
     Mat result_cnn;
 
@@ -221,6 +252,7 @@ int MTCNNDetection()
         {
 
             auto large_box = getLargestBboxFromBboxVec(faces_info);
+
             LiveFaceBox live_face_box = Bbox2LiveFaceBox(large_box);
             
             cv::Mat aligned_img = alignFaceImage(frame,large_box,face_landmark_gt_matrix);
@@ -229,14 +261,14 @@ int MTCNNDetection()
             // normalize
             face_descriptor = Statistics::zScore(face_descriptor);
 
-            int idx = getClosestFaceDescriptorIdx(disk_face_descriptors,face_descriptor);
+            std::string person_name = getClosestFaceDescriptorPersonName(disk_face_descriptors,face_descriptor);
             
-            if(idx>=0)
+            if(!person_name.empty())
             {
-                cout<<"face conhecida\n";
+                cout<<person_name<<"\n";
             }
             else{
-                cout<<"face estranha\n";
+                cout<<"unknown person"<<"\n";
             }
 
             confidence = live.Detect(frame,live_face_box);
@@ -248,11 +280,16 @@ int MTCNNDetection()
             }
             else
             {
-                //putText(result_cnn, "True face", cv::Point(5, 80), cv::FONT_HERSHEY_SIMPLEX,0.75, cv::Scalar(255, 255, 0),2);     
+                //putText(result_cnn, person_name, cv::Point(30, 40), cv::FONT_HERSHEY_SIMPLEX,0.75, cv::Scalar(255, 255, 0),2);   
+                
+                putText(frame, person_name, cv::Point(15, 80), cv::FONT_HERSHEY_SIMPLEX,0.75, cv::Scalar(255, 255, 0),2);  
+
                 liveface="True face";
+                
             }
 
             cout<<liveface<<"\n";
+
             cv::putText(frame,liveface,cv::Point(15,40),1,2.0,cv::Scalar(255,0,0));
             cv::rectangle(frame, Point(large_box.x1*ratio_x, large_box.y1*ratio_y), Point(large_box.x2*ratio_x,large_box.y2*ratio_y), cv::Scalar(0, 0, 255), 2);
         }

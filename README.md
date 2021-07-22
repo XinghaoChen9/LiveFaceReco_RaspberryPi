@@ -10,6 +10,9 @@ Face recognition and live estimation on Raspberry Pi 4B with average FPS around 
 
 **`2020-08-26`**: add ncnn libs (ubunutu, arm64-v8a, armeabi-v7a, and RaspberryPi4B ) to include folder
 
+**`2021-07-22`**: reworked cmakefiles and livefacereco code, added ParallelVideoCapture module and DatasetHandler module. **[y9luiz](https://github.com/y9luiz/)**
+
+
 ## Introduction
 
 The project implements **Face Recognition** and **Face Anti Spoofing** on **Raspberry pi** with the models transformed to **ncnn**. Besides, the whole project is designed as an **entrance guard system** by reading face images in the img folder and determining whether the input face is in the dataset by **Arcface**. The most interesting function is that it is capable to estimate whether the face getting from the camera is real **just relaying on the input image** instead of with the help of human body sensors or temperature sensors. As a result, it can avoid the situation of deceived by false faces, including printed paper photos, the display screen of electronic products, silicone masks, 3D human images, etc.
@@ -109,7 +112,7 @@ make -j4
 
 - [ ] Implement RetinaFace as the detector
 - [ ] optimize FPS when output frame is large
-
+- [ ] Network communication to work with IoT devices.
 ---
 
 ## Citation

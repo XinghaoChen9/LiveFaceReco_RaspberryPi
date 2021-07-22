@@ -4,15 +4,7 @@ PROJECT(LiveFaceReco)
 
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-message("ncnn path: " ${NCNN_PATH})
-
-
 find_package(OpenCV REQUIRED HINTS /home/luiz/Libraries/opencv_install/share/OpenCV)
-
-message(${OpenCV_PATH})
-
-message("achou opencv? " ${OpenCV_LIBS})
-
 
 SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)

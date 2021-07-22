@@ -14,7 +14,7 @@ message(${OpenCV_PATH})
 message("achou opencv? " ${OpenCV_LIBS})
 
 
-SET(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
@@ -51,6 +51,7 @@ ADD_LIBRARY(facedetect STATIC
 			src/arcface.h
 			src/mtcnn_new.cpp
 			src/mtcnn_new.h
+			src/DatasetHandler/image_dataset_handler.hpp
 
 )
 

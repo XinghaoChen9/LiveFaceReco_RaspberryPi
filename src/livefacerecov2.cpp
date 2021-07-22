@@ -15,6 +15,8 @@
 #include "ParallelVideoCapture/parallel_video_capture.hpp"
 #include "mtcnn_new.h"
 #include "FacePreprocess.h"
+#include "DatasetHandler/image_dataset_handler.hpp"
+#include <algorithm>
 
 #define PI 3.14159265
 using namespace std;
@@ -81,7 +83,26 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
     cout <<"loading succeed! "<<image_number<<" pictures in total"<<endl;
     
 }
+void calculateFaceDescriptorsFromImgDataset(Arcface & facereco,std::map<std::string,std::list<cv::Mat>> & img_dataset,std::map<std::string, std::list<cv::Mat>> & face_descriptors_map)
+{
+    int img_idx = 0;
+    const int image_number = img_dataset.size();
+    for(const auto & dataset_pair:img_dataset)
+    {
+        const std::string person_name = dataset_pair.first;
 
+        std::list<cv::Mat> descriptors;
+
+        for(const auto & face_img:dataset_pair.second)
+        {
+            cv::Mat face_descriptor = facereco.getFeature(face_img);
+            descriptors.push_back( Statistics::zScore(face_descriptor));
+            printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
+        }
+        face_descriptors_map[person_name] = std::move(descriptors);
+        
+    }
+}
 void loadLiveModel( Live & live )
 {
     //Live detection configs
@@ -192,6 +213,56 @@ std::string  getClosestFaceDescriptorPersonName(std::map<std::string,cv::Mat> & 
 
     return person_name;
 }
+std::string  getClosestFaceDescriptorPersonName(std::map<std::string,std::list<cv::Mat>> & disk_face_descriptors, cv::Mat face_descriptor)
+{
+    vector<std::list<double>> score_(disk_face_descriptors.size());
+
+    std::vector<std::string> labels;
+
+    int i = 0;
+
+    for(const auto & disk_descp:disk_face_descriptors)
+    {
+        for(const auto & descriptor:disk_descp.second)
+        {
+            score_[i].push_back(Statistics::cosineDistance(descriptor, face_descriptor));
+        }
+
+        labels.push_back(disk_descp.first);
+        i++;
+    
+    }
+
+    int maxPosition = max_element(score_.begin(),score_.end()) - score_.begin();
+    
+    auto get_max_from_score_list = 
+                            [&]()
+                            {
+                                double max = *score_[maxPosition].begin();
+                                for(const auto & elem:score_[maxPosition])
+                                {
+                                    if(max<elem)
+                                    {
+                                        max = elem;
+                                    }
+                                }
+                                return max;
+                            }; 
+
+    double max = get_max_from_score_list();
+
+    int pos = max>face_thre?maxPosition:-1;
+
+    std::string person_name = "";
+    if(pos>=0)
+    {
+        person_name = labels[pos];
+    }
+    
+    score_.clear();
+
+    return person_name;
+}
 
 int MTCNNDetection()
 {
@@ -201,8 +272,14 @@ int MTCNNDetection()
     << CV_SUBMINOR_VERSION << endl;
 
     Arcface facereco;
-    std::map<std::string,cv::Mat> disk_face_descriptors;
-    calculateFaceDescriptorsFromDisk(facereco,disk_face_descriptors);
+
+    // load the dataset and store it inside a dictionary
+    ImageDatasetHandler img_dataset_handler(project_path + "/imgs/");
+    std::map<std::string,std::list<cv::Mat>> dataset_imgs = img_dataset_handler.getDatasetMap();
+
+    std::map<std::string,std::list<cv::Mat>> face_descriptors_dict;
+    calculateFaceDescriptorsFromImgDataset(facereco,dataset_imgs,face_descriptors_dict);
+    //calculateFaceDescriptorsFromDisk(facereco,disk_face_descriptors);
 
     Live live;
     loadLiveModel(live);
@@ -210,8 +287,8 @@ int MTCNNDetection()
     float factor = 0.709f;
     float threshold[3] = {0.7f, 0.6f, 0.6f};
 
-    ParallelVideoCapture cap("udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink sync=false",cv::CAP_GSTREAMER,30); //using camera capturing
-                           
+    //ParallelVideoCapture cap("udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink sync=false",cv::CAP_GSTREAMER,30); //using camera capturing
+    ParallelVideoCapture cap(0);                    
     cap.startCapture();
 
     std::cout<<"okay!\n";
@@ -261,7 +338,7 @@ int MTCNNDetection()
             // normalize
             face_descriptor = Statistics::zScore(face_descriptor);
 
-            std::string person_name = getClosestFaceDescriptorPersonName(disk_face_descriptors,face_descriptor);
+            std::string person_name = getClosestFaceDescriptorPersonName(face_descriptors_dict,face_descriptor);
             
             if(!person_name.empty())
             {

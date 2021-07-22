@@ -40,7 +40,7 @@ const cv::Size frame_size = Size(output_width,output_height);
 const float ratio_x = (float)output_width/ input_width;
 const float ratio_y = (float)output_height/ input_height;
 
-void calculateFaceDescriptorsFromDisk(Live & live );
+void loadLiveModel(Live & live );
 int MTCNNDetection();
 
 

@@ -40,11 +40,9 @@ endif()
 find_package(ncnn REQUIRED HINTS ${NCNN_ROOT_PATH}/lib/cmake)
 
 ADD_LIBRARY(facedetect STATIC
-			include/FacePreprocess.h 			
-			src/livefacerecov2.cpp
+			include/FacePreprocess.h 					
 			src/livefacereco.hpp
-
-			#src/livefacereco.cpp
+			src/livefacereco.cpp
 			src/live.cpp
 			src/live.h
 			src/arcface.cpp

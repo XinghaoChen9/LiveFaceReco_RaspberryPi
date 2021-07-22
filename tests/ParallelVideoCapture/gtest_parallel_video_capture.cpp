@@ -6,7 +6,7 @@
 // Demonstrate some basic assertions.
 TEST(ParallelVideoCapture, BasicAssertions) {
 
-  ParallelVideoCapture cap("/home/luiz/Videos/niver_magina.mp4");
+  ParallelVideoCapture cap(0);
   EXPECT_FALSE(cap.isRunning());
   EXPECT_EQ(cap.getIntervalMs(), 33);
   EXPECT_TRUE(cap.grab());

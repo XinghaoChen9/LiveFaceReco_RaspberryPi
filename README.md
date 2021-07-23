@@ -6,11 +6,11 @@ Face recognition and live estimation on Raspberry Pi 4B with average FPS around 
 
 ## **Update**
 
+**`2021-07-22`**: reworked cmakefiles and livefacereco code, added ParallelVideoCapture module and DatasetHandler module. **[y9luiz](https://github.com/y9luiz/)**
+
 **`2020-09-05`**: with the help of **[konglingzheng](https://github.com/konglingzheng)**, add ncnn lib of nano, please simply change the path in the cmakelist when other platform is used. 
 
 **`2020-08-26`**: add ncnn libs (ubunutu, arm64-v8a, armeabi-v7a, and RaspberryPi4B ) to include folder
-
-**`2021-07-22`**: reworked cmakefiles and livefacereco code, added ParallelVideoCapture module and DatasetHandler module. **[y9luiz](https://github.com/y9luiz/)**
 
 
 ## Introduction

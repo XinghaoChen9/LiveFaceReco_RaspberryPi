@@ -1,26 +1,25 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
+
 PROJECT(LiveFaceReco)
-FIND_PACKAGE(OpenCV 4 REQUIRED)
-SET(CMAKE_CXX_STANDARD 11)
+
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+find_package(OpenCV REQUIRED)
+
+SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ldl -lpthread")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -ldl -lpthread")
+
 
 LINK_DIRECTORIES(${HOME_TVM}/build)
-
-#select the corresponding lib file
-#LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/include/libs/ubuntu)
-#LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/include/libs/arm64-v8a)
-#LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/include/libs/armeabi-v7a)
-#LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/include/libs/nano)
-LINK_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/include/libs/RaspberryPi4B)
 
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS}
 		    ${PROJECT_SOURCE_DIR}/include)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/src)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/include/ncnn)
+INCLUDE_DIRECTORIES(${NCNN_ROOT_PATH}/include)
 
 find_package(OpenMP REQUIRED)
 if(OPENMP_FOUND)
@@ -30,19 +29,30 @@ if(OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+find_package(ncnn REQUIRED HINTS ${NCNN_ROOT_PATH}/lib/cmake)
+
 ADD_LIBRARY(facedetect STATIC
-			include/FacePreprocess.h 			
-			src/livefacereco.cpp
+			include/FacePreprocess.h 					
 			src/livefacereco.hpp
+			src/livefacereco.cpp
 			src/live.cpp
 			src/live.h
 			src/arcface.cpp
 			src/arcface.h
 			src/mtcnn_new.cpp
 			src/mtcnn_new.h
+			src/DatasetHandler/image_dataset_handler.hpp
+
 )
 
+add_subdirectory(src)
+
+if(${BUILD_TESTS})
+	include(${CMAKE_MODULE_PATH}/Tests.cmake)
+endif()
 
 ADD_EXECUTABLE(LiveFaceReco src/main.cpp)
-#TARGET_LINK_LIBRARIES(LiveFaceReco ${OpenCV_LIBS} ${NCNN_LIB} facedetect libncnn.a)
-TARGET_LINK_LIBRARIES(LiveFaceReco ${OpenCV_LIBS} facedetect libncnn.a)
+
+TARGET_LINK_LIBRARIES(LiveFaceReco ${OpenCV_LIBS}  facedetect ncnn ParallelVideoCapture pthread)
+TARGET_LINK_LIBRARIES(facedetect ${OpenCV_LIBS} ncnn)
+TARGET_INCLUDE_DIRECTORIES(LiveFaceReco PRIVATE ${OpenCV_INCLUDE_DIRS})

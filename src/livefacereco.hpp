@@ -3,9 +3,7 @@
 //
 #include <iostream>
 #include <stdio.h>
-#include <array>
-#include <vector>
-#include <opencv2/opencv.hpp>
+
 #include "stdlib.h"
 #include <iostream>
 #include <array>
@@ -14,14 +12,13 @@
 #include <fstream>
 #include <iterator>
 #include <algorithm>
-#include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "arcface.h"
-
+#include "live.h"
 using namespace std;
 using namespace cv;
 
@@ -36,14 +33,14 @@ const int input_width = 320;
 const int input_height = 240;
 const int output_width = 320;
 const int output_height = 240;
-const string project_path="/home/pi/project/LiveFaceReco_RaspberryPi";
+const string project_path="/home/luiz/Faculdade/TCC/LiveFaceReco_RaspberryPi";
 //end
 
 const cv::Size frame_size = Size(output_width,output_height);
 const float ratio_x = (float)output_width/ input_width;
 const float ratio_y = (float)output_height/ input_height;
 
-
+void loadLiveModel(Live & live );
 int MTCNNDetection();
 
 

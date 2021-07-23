@@ -1,5 +1,5 @@
 #include "arcface.h"
-#include "livefacereco.hpp"
+//#include "livefacereco.hpp"
 
 ncnn::Mat bgr2rgb(ncnn::Mat src)
 {

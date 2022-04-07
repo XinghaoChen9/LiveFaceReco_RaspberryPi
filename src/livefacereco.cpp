@@ -372,7 +372,7 @@ int MTCNNDetection()
            
         }
        
-        cv::imshow("img", frame);
+        cv::imwrite("/home/pi/temp.jpg", frame);
 
         char k = cv::waitKey(33);
     

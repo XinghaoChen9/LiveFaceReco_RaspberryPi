@@ -23,7 +23,7 @@ using namespace std;
 
 double sum_score, sum_fps,sum_confidence;
 
-#define  PROJECT_PATH "/home/luiz/Faculdade/TCC/LiveFaceReco_RaspberryPi";
+#define  PROJECT_PATH "/home/pi/LiveFaceReco_RaspberryPi";
 
 std::vector<std::string> split(const std::string& s, char seperator)
 {
@@ -372,7 +372,7 @@ int MTCNNDetection()
            
         }
        
-        cv::imwrite("/home/pi/temp.jpg", frame);
+        cv::imwrite("/home/pi/LiveFaceReco_RaspberryPi/temp.jpg", frame);
 
         char k = cv::waitKey(33);
     

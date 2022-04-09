@@ -311,33 +311,34 @@ int MTCNNDetection()
     std::string liveface;
     float ratio_x = 1;
     float ratio_y = 1;
+    int flag = 0;
 
     while(cap.isOpened())
     {
         frame = cap.getFrame();    
         //cv::resize(frame,frame,cv::Size(300,300));
-
+        cout << "frame size: " << frame.size() << endl;
         if(frame.empty())
         {
             continue;
         } 
         ++count;
-
+        flag = 0;
         //detect faces
         std::vector<Bbox> faces_info = detect_mtcnn(frame); 
         if(faces_info.size()>=1)
         {
-
+            flag = 1;
             auto large_box = getLargestBboxFromBboxVec(faces_info);
-
+            cout << "large_box got" << endl;
             LiveFaceBox live_face_box = Bbox2LiveFaceBox(large_box);
             
             cv::Mat aligned_img = alignFaceImage(frame,large_box,face_landmark_gt_matrix);
-
+            cout << "aligned_img got" << endl;
             cv::Mat face_descriptor = facereco.getFeature(aligned_img);
             // normalize
             face_descriptor = Statistics::zScore(face_descriptor);
-
+            cout << "face_descriptor created" << endl;
             std::string person_name = getClosestFaceDescriptorPersonName(face_descriptors_dict,face_descriptor);
             
             if(!person_name.empty())
@@ -371,8 +372,12 @@ int MTCNNDetection()
             cv::putText(frame,liveface,cv::Point(15,40),1,2.0,cv::Scalar(255,0,0));
            
         }
+        if (flag == 0)
+        {
+            cout << "no face detected" << endl;
+        }
        
-        cv::imwrite("/home/pi/LiveFaceReco_RaspberryPi/temp.jpg", frame);
+        // cv::imwrite("/home/pi/LiveFaceReco_RaspberryPi/temp.jpg", frame);
 
         char k = cv::waitKey(33);
     

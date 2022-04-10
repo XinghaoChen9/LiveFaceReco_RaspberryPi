@@ -48,7 +48,7 @@ std::vector<std::string> split(const std::string& s, char seperator)
 void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv::Mat> & face_descriptors_map)
 {
     const std::string project_path = PROJECT_PATH;
-    std::string pattern_jpg = project_path + "/img/*.jpg";
+    std::string pattern_jpg = project_path + "/imgs/*/*.jpg";
 	std::vector<cv::String> image_names;
     
 	cv::glob(pattern_jpg, image_names);
@@ -78,7 +78,7 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
         cv::Mat face_descriptor = facereco.getFeature(face_img);
 
         face_descriptors_map[person_name] = Statistics::zScore(face_descriptor);
-        cout << "now loading image " << img_idx << " out of " << image_number << endl;
+        cout << "now loading image " << ++img_idx << " out of " << image_number << endl;
         //printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
     }
    

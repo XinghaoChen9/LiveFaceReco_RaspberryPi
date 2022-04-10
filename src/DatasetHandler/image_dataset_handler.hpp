@@ -72,7 +72,7 @@ class ImageDatasetHandler: public AbstractDatasetHandler<cv::Mat>{
                     cv::Mat img;
                     const std::string path = file.path();
                     img = cv::imread(path);
-                    
+                    cout << "loading picture  " << path << endl;
                     image_list.push_back(img);
                 }
             }

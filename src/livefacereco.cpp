@@ -92,14 +92,20 @@ void calculateFaceDescriptorsFromImgDataset(Arcface & facereco,std::map<std::str
         const std::string person_name = dataset_pair.first;
 
         std::list<cv::Mat> descriptors;
-
-        for(const auto & face_img:dataset_pair.second)
-        {
-            cv::Mat face_descriptor = facereco.getFeature(face_img);
-            descriptors.push_back( Statistics::zScore(face_descriptor));
-            printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
+        if image_number == 0 {
+            cout << "No image files[jpg]" << endl;
+            return;
         }
-        face_descriptors_map[person_name] = std::move(descriptors);
+        else{
+            cout <<"loading pictures..."<<endl;
+            for(const auto & face_img:dataset_pair.second)
+            {
+                cv::Mat face_descriptor = facereco.getFeature(face_img);
+                descriptors.push_back( Statistics::zScore(face_descriptor));
+                printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
+            }
+            face_descriptors_map[person_name] = std::move(descriptors);
+        }
         
     }
 }
@@ -288,7 +294,8 @@ int MTCNNDetection()
     float threshold[3] = {0.7f, 0.6f, 0.6f};
 
     //ParallelVideoCapture cap("udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink sync=false",cv::CAP_GSTREAMER,30); //using camera capturing
-    ParallelVideoCapture cap(0);                    
+    ParallelVideoCapture cap("/home/pi/testvideo.mp4");
+    //ParallelVideoCapture cap(0);                    
     cap.startCapture();
 
     std::cout<<"okay!\n";
@@ -346,7 +353,12 @@ int MTCNNDetection()
                 cout<<person_name<<"\n";
             }
             else{
-                cout<<"unknown person"<<"\n";
+                if (record_face){
+                    cout << "recording new face..."<<"\n";
+                    waitKey(2000);
+                    imwrite(project_path+ format("/imgs/%d.jpg", count), aligned);
+                }
+                else cout<<"unknown person"<<"\n";
             }
 
             confidence = live.Detect(frame,live_face_box);

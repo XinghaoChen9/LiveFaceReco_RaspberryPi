@@ -86,7 +86,7 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
 void calculateFaceDescriptorsFromImgDataset(Arcface & facereco,std::map<std::string,std::list<cv::Mat>> & img_dataset,std::map<std::string, std::list<cv::Mat>> & face_descriptors_map)
 {
     int img_idx = 0;
-    const int image_number = img_dataset.size();
+    const int image_number = img_dataset.size()*5;
     for(const auto & dataset_pair:img_dataset)
     {
         const std::string person_name = dataset_pair.first;
@@ -102,7 +102,7 @@ void calculateFaceDescriptorsFromImgDataset(Arcface & facereco,std::map<std::str
             {
                 cv::Mat face_descriptor = facereco.getFeature(face_img);
                 descriptors.push_back( Statistics::zScore(face_descriptor));
-                cout << "now loading image " << img_idx << " out of " << image_number << endl;
+                cout << "now loading image " << ++img_idx << " out of " << image_number << endl;
                 //printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
             }
             face_descriptors_map[person_name] = std::move(descriptors);

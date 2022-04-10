@@ -70,7 +70,6 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
     {
         cout <<"image name:"<<img_name<<endl;
         auto splitted_string = split(img_name,'/');
-        cout <<"splitted name:"<<splitted_string<<endl;
         cout <<"person name:"<<splitted_string[splitted_string.size()-1]<<endl;
         auto person_name = splitted_string[splitted_string.size()-1];
         std::cout<<person_name<<"\n";

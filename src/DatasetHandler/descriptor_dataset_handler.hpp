@@ -102,6 +102,8 @@ class DescriptorDatasetHandler: public AbstractDatasetHandler<CV_DESCRIPTOR>
 
         void getDescriptorsFromFolder(const std::string folder_path, std::list<DLIB_FLOAT_DESCRIPTOR> & descriptor_list)
         { 
+            cout << "Getting Descriptor" << endl;
+            cout << "folder path " << folder_path << endl;
             for (const auto & file  : std::filesystem::directory_iterator(folder_path))
             {
                 cout << file.path() << endl;

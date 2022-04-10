@@ -21,6 +21,7 @@ class DescriptorDatasetHandler: public AbstractDatasetHandler<CV_DESCRIPTOR>
 
         void loadDataset()
         {
+            cout << "loading dataset" << endl;
             std::string root_folder = this->root_folder_;
             
             std::vector<std::string> folder_list;

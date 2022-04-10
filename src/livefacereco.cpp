@@ -356,7 +356,7 @@ int MTCNNDetection()
                 if (record_face){
                     cout << "recording new face..."<<"\n";
                     waitKey(2000);
-                    imwrite(project_path+ format("/imgs/%d.jpg", count), aligned);
+                    imwrite(project_path+ format("/imgs/%d.jpg", count), aligned_img);
                 }
                 else cout<<"unknown person"<<"\n";
             }

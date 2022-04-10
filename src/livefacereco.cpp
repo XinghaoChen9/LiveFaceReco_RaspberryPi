@@ -68,7 +68,10 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
     //convert to vector and store into fc, whcih is benefical to furthur operation
 	for(auto const & img_name:image_names)
     {
+        cout <<"image name:"<<img_name<<endl;
         auto splitted_string = split(img_name,'/');
+        cout <<"splitted name:"<<splitted_string<<endl;
+        cout <<"person name:"<<splitted_string[splitted_string.size()-1]<<endl;
         auto person_name = splitted_string[splitted_string.size()-1];
         std::cout<<person_name<<"\n";
         face_img = cv::imread(img_name);

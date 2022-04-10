@@ -287,9 +287,9 @@ int MTCNNDetection()
     std::map<std::string,std::list<cv::Mat>> dataset_imgs = img_dataset_handler.getDatasetMap();
 
     //std::map<std::string,std::list<cv::Mat>> face_descriptors_dict;
-    std::map<std::string,cv::Mat> disk_face_descriptors;
+    std::map<std::string,cv::Mat> face_descriptors_dict;
     //calculateFaceDescriptorsFromImgDataset(facereco,dataset_imgs,face_descriptors_dict);
-    calculateFaceDescriptorsFromDisk(facereco,disk_face_descriptors);
+    calculateFaceDescriptorsFromDisk(facereco,face_descriptors_dict);
 
     Live live;
     loadLiveModel(live);

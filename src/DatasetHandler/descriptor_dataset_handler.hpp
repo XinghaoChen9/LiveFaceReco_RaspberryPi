@@ -82,7 +82,8 @@ class DescriptorDatasetHandler: public AbstractDatasetHandler<CV_DESCRIPTOR>
                     file>>descriptor;  
                 }
                 else{
-                        return;
+                    std::cout<<"file "<<filepath<<" not found\n";
+                    return;
                 }
 
         }
@@ -103,13 +104,16 @@ class DescriptorDatasetHandler: public AbstractDatasetHandler<CV_DESCRIPTOR>
         { 
             for (const auto & file  : std::filesystem::directory_iterator(folder_path))
             {
+                cout << file.path() << endl;
                 if(isExtension(file.path(),"data"))
                 {
+                    cout << "loading data" << file.path() << "\n";
                     DLIB_FLOAT_DESCRIPTOR descriptor;
               
                     loadDescriptor(descriptor,file.path());  
                     descriptor_list.push_back(descriptor);
                 }
+                else cout << "no data file found!" << file.path() << "\n";
             }
         };
       

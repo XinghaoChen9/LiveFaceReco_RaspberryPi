@@ -92,7 +92,7 @@ void calculateFaceDescriptorsFromImgDataset(Arcface & facereco,std::map<std::str
         const std::string person_name = dataset_pair.first;
 
         std::list<cv::Mat> descriptors;
-        if image_number == 0 {
+        if (image_number == 0) {
             cout << "No image files[jpg]" << endl;
             return;
         }

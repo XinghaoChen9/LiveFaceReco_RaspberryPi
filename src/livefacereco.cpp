@@ -71,8 +71,8 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
         cout <<"image name:"<<img_name<<endl;
         auto splitted_string = split(img_name,'/');
         auto splitted_string_2 = splitted_string[splitted_string.size()-1];
-        std::size_t name_length = filename.find_last_of('_');
-        auto person_name =  filename.substr(0,name_length);
+        std::size_t name_length = splitted_string_2.find_last_of('_');
+        auto person_name =  splitted_string_2.substr(0,name_length);
         std::cout<<person_name<<"\n";
         face_img = cv::imread(img_name);
 

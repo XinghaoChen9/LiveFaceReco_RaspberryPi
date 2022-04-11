@@ -330,6 +330,7 @@ int MTCNNDetection()
     float ratio_y = 1;
     int flag = 0;
     int record_count = 0;
+    int file_save_count = 0;
 
     while(cap.isOpened())
     {
@@ -408,8 +409,13 @@ int MTCNNDetection()
         {
             cout << "no face detected" << endl;
         }
-       
-        // cv::imwrite("/home/pi/LiveFaceReco_RaspberryPi/temp.jpg", frame);
+        if (file_save_count == 50)
+        {
+            file_save_count = 0;
+            cv::imwrite("/home/pi/LiveFaceReco_RaspberryPi/temp.jpg", frame);
+        }
+        else file_save_count++;
+        
 
         char k = cv::waitKey(33);
     

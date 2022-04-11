@@ -209,16 +209,16 @@ std::string  getClosestFaceDescriptorPersonName(std::map<std::string,cv::Mat> & 
 
     for(const auto & disk_descp:disk_face_descriptors)
     {
-        cout << "comparing with " << disk_descp.first << endl;
+        // cout << "comparing with " << disk_descp.first << endl;
 
         score_[i] = (Statistics::cosineDistance(disk_descp.second, face_descriptor));
-        cout << "score  " << score_[i] << endl;
+        //cout << "score  " << score_[i] << endl;
         labels.push_back(disk_descp.first);
         i++;
     }
     int maxPosition = max_element(score_.begin(),score_.end()) - score_.begin(); 
     int pos = score_[maxPosition]>face_thre?maxPosition:-1;
-    cout << "score_[maxPosition] " << score_[maxPosition] << endl;
+    //cout << "score_[maxPosition] " << score_[maxPosition] << endl;
     std::string person_name = "";
     if(pos>=0)
     {
@@ -329,6 +329,7 @@ int MTCNNDetection()
     float ratio_x = 1;
     float ratio_y = 1;
     int flag = 0;
+    int record_count = 0;
 
     while(cap.isOpened())
     {
@@ -360,17 +361,23 @@ int MTCNNDetection()
             
             if(!person_name.empty())
             {
+                record_count = 0;
                 cout<<person_name<<endl;
             }
             else{
                 if (record_face){
-                    cout << "recording new face..." << endl;
-                    cout << "input your new face name:"<< endl;
-                    std::string new_name;
-                    std::cin >> new_name;
-                    imwrite(project_path+"/img/"+new_name+"_0.jpg" , aligned_img);
-                    face_descriptors_dict[new_name] = face_descriptor;
+                    if (record_count == 10){
+                        record_count = 0;
+                        cout << "recording new face..." << endl;
+                        cout << "input your new face name:"<< endl;
+                        std::string new_name;
+                        std::cin >> new_name;
+                        imwrite(project_path+"/img/"+new_name+"_0.jpg" , aligned_img);
+                        face_descriptors_dict[new_name] = face_descriptor;
+                    }
+                    else record_count++;
                 }
+
                 else cout<<"unknown person"<<"\n";
             }
 

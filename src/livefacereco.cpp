@@ -73,7 +73,7 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
         auto splitted_string_2 = splitted_string[splitted_string.size()-1];
         std::size_t name_length = splitted_string_2.find_last_of('_');
         auto person_name =  splitted_string_2.substr(0,name_length);
-        std::cout<<person_name<<"\n";
+        //std::cout<<person_name<<"\n";
         face_img = cv::imread(img_name);
 
         cv::Mat face_descriptor = facereco.getFeature(face_img);
@@ -299,8 +299,8 @@ int MTCNNDetection()
     float threshold[3] = {0.7f, 0.6f, 0.6f};
 
     //ParallelVideoCapture cap("udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink sync=false",cv::CAP_GSTREAMER,30); //using camera capturing
-    ParallelVideoCapture cap("/home/pi/testvideo.mp4");
-    //ParallelVideoCapture cap(0);                    
+    //ParallelVideoCapture cap("/home/pi/testvideo.mp4");
+    ParallelVideoCapture cap(0);                    
     cap.startCapture();
 
     std::cout<<"okay!\n";
@@ -355,13 +355,25 @@ int MTCNNDetection()
             
             if(!person_name.empty())
             {
-                cout<<person_name<<"\n";
+                if (record_face){
+                    cout << "recording existed face..." << endl;
+                    std::string pattern_jpg = project_path + "/img/"+person_name+"*.jpg";
+	                std::vector<cv::String> names;
+	                cv::glob(pattern_jpg, names);
+                    int photo_number=names.size();
+                    cout << "photo_number: " << photo_number << endl;
+                    std::string photo_name = project_path + "/img/"+person_name+"_"+std::to_string(photo_number)+".jpg";
+                    imwrite(photo_name,aligned_img);
+                }
+                else cout<<person_name<<endl;
             }
             else{
                 if (record_face){
-                    cout << "recording new face..."<<"\n";
-                    waitKey(2000);
-                    imwrite(project_path+ format("/imgs/%d.jpg", count), aligned_img);
+                    cout << "recording new face..." << endl;
+                    cout << "input your new face name:"<< endl;
+                    std::string new_name;
+                    std::cin >> new_name;
+                    imwrite(project_path+ format("/img/%s_0.jpg", new_name), aligned_img);
                 }
                 else cout<<"unknown person"<<"\n";
             }

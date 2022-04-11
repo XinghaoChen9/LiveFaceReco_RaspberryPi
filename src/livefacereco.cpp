@@ -57,7 +57,8 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
 
 	if (image_number == 0) {
 		std::cout << "No image files[jpg]" << std::endl;
-        return;
+        std::cout << "At least one image of 112*112 should be put into the img folder. Otherwise, the program will broke down." << std::endl;
+        exit();
 	}
     //cout <<"loading pictures..."<<endl;
     //cout <<"image number in total:"<<image_number<<endl;

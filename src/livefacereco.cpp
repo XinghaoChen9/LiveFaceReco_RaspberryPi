@@ -208,7 +208,10 @@ std::string  getClosestFaceDescriptorPersonName(std::map<std::string,cv::Mat> & 
 
     for(const auto & disk_descp:disk_face_descriptors)
     {
+        cout << "comparing with " << disk_descp.first << endl;
+
         score_[i] = (Statistics::cosineDistance(disk_descp.second, face_descriptor));
+        cout << "score  " << score_[i] << endl;
         labels.push_back(disk_descp.first);
         i++;
     }

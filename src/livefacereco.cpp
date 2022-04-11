@@ -59,8 +59,8 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
 		std::cout << "No image files[jpg]" << std::endl;
         return;
 	}
-    cout <<"loading pictures..."<<endl;
-    cout <<"image number in total:"<<image_number<<endl;
+    //cout <<"loading pictures..."<<endl;
+    //cout <<"image number in total:"<<image_number<<endl;
     cv::Mat  face_img;
     unsigned int img_idx = 0;
 
@@ -68,7 +68,7 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
     //convert to vector and store into fc, whcih is benefical to furthur operation
 	for(auto const & img_name:image_names)
     {
-        cout <<"image name:"<<img_name<<endl;
+        //cout <<"image name:"<<img_name<<endl;
         auto splitted_string = split(img_name,'/');
         auto splitted_string_2 = splitted_string[splitted_string.size()-1];
         std::size_t name_length = splitted_string_2.find_last_of('_');
@@ -79,8 +79,8 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
         cv::Mat face_descriptor = facereco.getFeature(face_img);
 
         face_descriptors_map[person_name] = Statistics::zScore(face_descriptor);
-        cout << "now loading image " << ++img_idx << " out of " << image_number << endl;
-        //printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
+        //cout << "now loading image " << ++img_idx << " out of " << image_number << endl;
+        printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
     }
    
     cout <<"loading succeed! "<<image_number<<" pictures in total"<<endl;
@@ -284,8 +284,8 @@ int MTCNNDetection()
     Arcface facereco;
 
     // load the dataset and store it inside a dictionary
-    ImageDatasetHandler img_dataset_handler(project_path + "/imgs/");
-    std::map<std::string,std::list<cv::Mat>> dataset_imgs = img_dataset_handler.getDatasetMap();
+    //ImageDatasetHandler img_dataset_handler(project_path + "/imgs/");
+    //std::map<std::string,std::list<cv::Mat>> dataset_imgs = img_dataset_handler.getDatasetMap();
 
     //std::map<std::string,std::list<cv::Mat>> face_descriptors_dict;
     std::map<std::string,cv::Mat> face_descriptors_dict;
@@ -299,8 +299,8 @@ int MTCNNDetection()
     float threshold[3] = {0.7f, 0.6f, 0.6f};
 
     //ParallelVideoCapture cap("udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink sync=false",cv::CAP_GSTREAMER,30); //using camera capturing
-    ParallelVideoCapture cap("/home/pi/testvideo.mp4");
-    //ParallelVideoCapture cap(0);                    
+    //ParallelVideoCapture cap("/home/pi/testvideo.mp4");
+    ParallelVideoCapture cap(0);                    
     cap.startCapture();
 
     std::cout<<"okay!\n";
@@ -342,26 +342,38 @@ int MTCNNDetection()
         {
             flag = 1;
             auto large_box = getLargestBboxFromBboxVec(faces_info);
-            cout << "large_box got" << endl;
+            //cout << "large_box got" << endl;
             LiveFaceBox live_face_box = Bbox2LiveFaceBox(large_box);
             
             cv::Mat aligned_img = alignFaceImage(frame,large_box,face_landmark_gt_matrix);
-            cout << "aligned_img got" << endl;
+            //cout << "aligned_img got" << endl;
             cv::Mat face_descriptor = facereco.getFeature(aligned_img);
             // normalize
             face_descriptor = Statistics::zScore(face_descriptor);
-            cout << "face_descriptor created" << endl;
+            //cout << "face_descriptor created" << endl;
             std::string person_name = getClosestFaceDescriptorPersonName(face_descriptors_dict,face_descriptor);
             
             if(!person_name.empty())
             {
-                cout<<person_name<<"\n";
+                if (record_face){
+                    cout << "recording existed face..." << endl;
+                    std::string pattern_jpg = project_path + "/img/"+person_name+"*.jpg";
+	                std::vector<cv::String> names;
+	                cv::glob(pattern_jpg, names);
+                    int photo_number=names.size();
+                    cout << "photo_number: " << photo_number << endl;
+                    std::string photo_name = project_path + "/img/"+person_name+"_"+std::to_string(photo_number)+".jpg";
+                    imwrite(photo_name,aligned_img);
+                }
+                else cout<<person_name<<endl;
             }
             else{
                 if (record_face){
-                    cout << "recording new face..."<<"\n";
-                    waitKey(2000);
-                    imwrite(project_path+ format("/imgs/%d.jpg", count), aligned_img);
+                    cout << "recording new face..." << endl;
+                    cout << "input your new face name:"<< endl;
+                    std::string new_name;
+                    std::cin >> new_name;
+                    imwrite(project_path+ format("/img/%s_0.jpg", new_name), aligned_img);
                 }
                 else cout<<"unknown person"<<"\n";
             }

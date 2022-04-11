@@ -214,6 +214,7 @@ std::string  getClosestFaceDescriptorPersonName(std::map<std::string,cv::Mat> & 
     }
     int maxPosition = max_element(score_.begin(),score_.end()) - score_.begin(); 
     int pos = score_[maxPosition]>face_thre?maxPosition:-1;
+    cout << "score_[maxPosition] " << score_[maxPosition] << endl;
     std::string person_name = "";
     if(pos>=0)
     {
@@ -342,15 +343,15 @@ int MTCNNDetection()
         {
             flag = 1;
             auto large_box = getLargestBboxFromBboxVec(faces_info);
-            cout << "large_box got" << endl;
+            //cout << "large_box got" << endl;
             LiveFaceBox live_face_box = Bbox2LiveFaceBox(large_box);
             
             cv::Mat aligned_img = alignFaceImage(frame,large_box,face_landmark_gt_matrix);
-            cout << "aligned_img got" << endl;
+            //cout << "aligned_img got" << endl;
             cv::Mat face_descriptor = facereco.getFeature(aligned_img);
             // normalize
             face_descriptor = Statistics::zScore(face_descriptor);
-            cout << "face_descriptor created" << endl;
+            //cout << "face_descriptor created" << endl;
             std::string person_name = getClosestFaceDescriptorPersonName(face_descriptors_dict,face_descriptor);
             
             if(!person_name.empty())

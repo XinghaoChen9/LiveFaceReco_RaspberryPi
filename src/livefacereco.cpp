@@ -373,7 +373,7 @@ int MTCNNDetection()
                     cout << "input your new face name:"<< endl;
                     std::string new_name;
                     std::cin >> new_name;
-                    imwrite(project_path+ format("/img/%s_0.jpg", new_name), aligned_img);
+                    imwrite(project_path+"/img/"+new_name+"_0.jpg" , aligned_img);
                 }
                 else cout<<"unknown person"<<"\n";
             }

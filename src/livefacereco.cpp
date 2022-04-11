@@ -58,7 +58,7 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
 	if (image_number == 0) {
 		std::cout << "No image files[jpg]" << std::endl;
         std::cout << "At least one image of 112*112 should be put into the img folder. Otherwise, the program will broke down." << std::endl;
-        exit();
+        exit(0);
 	}
     //cout <<"loading pictures..."<<endl;
     //cout <<"image number in total:"<<image_number<<endl;
@@ -369,6 +369,7 @@ int MTCNNDetection()
                     std::string new_name;
                     std::cin >> new_name;
                     imwrite(project_path+"/img/"+new_name+"_0.jpg" , aligned_img);
+                    face_descriptors_dict[new_name] = face_descriptor;
                 }
                 else cout<<"unknown person"<<"\n";
             }

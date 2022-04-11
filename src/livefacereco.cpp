@@ -59,8 +59,8 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
 		std::cout << "No image files[jpg]" << std::endl;
         return;
 	}
-    //cout <<"loading pictures..."<<endl;
-    //cout <<"image number in total:"<<image_number<<endl;
+    cout <<"loading pictures..."<<endl;
+    cout <<"image number in total:"<<image_number<<endl;
     cv::Mat  face_img;
     unsigned int img_idx = 0;
 
@@ -68,7 +68,7 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
     //convert to vector and store into fc, whcih is benefical to furthur operation
 	for(auto const & img_name:image_names)
     {
-        //cout <<"image name:"<<img_name<<endl;
+        cout <<"image name:"<<img_name<<endl;
         auto splitted_string = split(img_name,'/');
         auto splitted_string_2 = splitted_string[splitted_string.size()-1];
         std::size_t name_length = splitted_string_2.find_last_of('_');
@@ -284,8 +284,8 @@ int MTCNNDetection()
     Arcface facereco;
 
     // load the dataset and store it inside a dictionary
-    //ImageDatasetHandler img_dataset_handler(project_path + "/imgs/");
-    //std::map<std::string,std::list<cv::Mat>> dataset_imgs = img_dataset_handler.getDatasetMap();
+    ImageDatasetHandler img_dataset_handler(project_path + "/imgs/");
+    std::map<std::string,std::list<cv::Mat>> dataset_imgs = img_dataset_handler.getDatasetMap();
 
     //std::map<std::string,std::list<cv::Mat>> face_descriptors_dict;
     std::map<std::string,cv::Mat> face_descriptors_dict;

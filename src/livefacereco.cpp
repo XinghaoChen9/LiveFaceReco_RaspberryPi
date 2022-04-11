@@ -333,7 +333,7 @@ int MTCNNDetection()
     {
         frame = cap.getFrame();    
         //cv::resize(frame,frame,cv::Size(300,300));
-        cout << "frame size: " << frame.size() << endl;
+        //cout << "frame size: " << frame.size() << endl;
         if(frame.empty())
         {
             continue;
@@ -359,17 +359,7 @@ int MTCNNDetection()
             
             if(!person_name.empty())
             {
-                if (record_face){
-                    cout << "recording existed face..." << endl;
-                    std::string pattern_jpg = project_path + "/img/"+person_name+"*.jpg";
-	                std::vector<cv::String> names;
-	                cv::glob(pattern_jpg, names);
-                    int photo_number=names.size();
-                    cout << "photo_number: " << photo_number << endl;
-                    std::string photo_name = project_path + "/img/"+person_name+"_"+std::to_string(photo_number)+".jpg";
-                    imwrite(photo_name,aligned_img);
-                }
-                else cout<<person_name<<endl;
+                cout<<person_name<<endl;
             }
             else{
                 if (record_face){

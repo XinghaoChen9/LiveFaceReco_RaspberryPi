@@ -24,7 +24,7 @@ using namespace cv;
 
 // Adjustable Parameters
 const bool largest_face_only=true;
-const bool record_face=false;
+const bool record_face=true;
 const int distance_threshold = 90;
 const float face_thre=0.40;
 const float true_thre=0.89;

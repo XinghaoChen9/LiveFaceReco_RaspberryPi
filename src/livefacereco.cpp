@@ -79,8 +79,8 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
         cv::Mat face_descriptor = facereco.getFeature(face_img);
 
         face_descriptors_map[person_name] = Statistics::zScore(face_descriptor);
-        cout << "now loading image " << ++img_idx << " out of " << image_number << endl;
-        //printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
+        //cout << "now loading image " << ++img_idx << " out of " << image_number << endl;
+        printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
     }
    
     cout <<"loading succeed! "<<image_number<<" pictures in total"<<endl;

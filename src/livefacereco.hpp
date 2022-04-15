@@ -24,7 +24,7 @@ using namespace cv;
 
 // Adjustable Parameters
 const bool largest_face_only=true;
-const bool record_face=false;
+const bool record_face=true;
 const int distance_threshold = 90;
 const float face_thre=0.40;
 const float true_thre=0.89;
@@ -33,7 +33,7 @@ const int input_width = 320;
 const int input_height = 240;
 const int output_width = 320;
 const int output_height = 240;
-const string project_path="/home/luiz/Faculdade/TCC/LiveFaceReco_RaspberryPi";
+const string project_path="/home/pi/LiveFaceReco_RaspberryPi";
 //end
 
 const cv::Size frame_size = Size(output_width,output_height);

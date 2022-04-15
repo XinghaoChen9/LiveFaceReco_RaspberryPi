@@ -23,7 +23,7 @@ using namespace std;
 
 double sum_score, sum_fps,sum_confidence;
 
-#define  PROJECT_PATH "/home/luiz/Faculdade/TCC/LiveFaceReco_RaspberryPi";
+#define  PROJECT_PATH "/home/pi/LiveFaceReco_RaspberryPi";
 
 std::vector<std::string> split(const std::string& s, char seperator)
 {
@@ -52,15 +52,16 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
 	std::vector<cv::String> image_names;
     
 	cv::glob(pattern_jpg, image_names);
-
+    
     int image_number=image_names.size();
 
 	if (image_number == 0) {
 		std::cout << "No image files[jpg]" << std::endl;
-        return;
+        std::cout << "At least one image of 112*112 should be put into the img folder. Otherwise, the program will broke down." << std::endl;
+        exit(0);
 	}
-    cout <<"loading pictures..."<<endl;
-    
+    //cout <<"loading pictures..."<<endl;
+    //cout <<"image number in total:"<<image_number<<endl;
     cv::Mat  face_img;
     unsigned int img_idx = 0;
 
@@ -68,15 +69,18 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
     //convert to vector and store into fc, whcih is benefical to furthur operation
 	for(auto const & img_name:image_names)
     {
+        //cout <<"image name:"<<img_name<<endl;
         auto splitted_string = split(img_name,'/');
-        auto person_name = splitted_string[splitted_string.size()-1];
-        std::cout<<person_name<<"\n";
+        auto splitted_string_2 = splitted_string[splitted_string.size()-1];
+        std::size_t name_length = splitted_string_2.find_last_of('_');
+        auto person_name =  splitted_string_2.substr(0,name_length);
+        //std::cout<<person_name<<"\n";
         face_img = cv::imread(img_name);
 
         cv::Mat face_descriptor = facereco.getFeature(face_img);
 
         face_descriptors_map[person_name] = Statistics::zScore(face_descriptor);
-
+        //cout << "now loading image " << ++img_idx << " out of " << image_number << endl;
         printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
     }
    
@@ -86,20 +90,27 @@ void calculateFaceDescriptorsFromDisk(Arcface & facereco,std::map<std::string,cv
 void calculateFaceDescriptorsFromImgDataset(Arcface & facereco,std::map<std::string,std::list<cv::Mat>> & img_dataset,std::map<std::string, std::list<cv::Mat>> & face_descriptors_map)
 {
     int img_idx = 0;
-    const int image_number = img_dataset.size();
+    const int image_number = img_dataset.size()*5;
     for(const auto & dataset_pair:img_dataset)
     {
         const std::string person_name = dataset_pair.first;
 
         std::list<cv::Mat> descriptors;
-
-        for(const auto & face_img:dataset_pair.second)
-        {
-            cv::Mat face_descriptor = facereco.getFeature(face_img);
-            descriptors.push_back( Statistics::zScore(face_descriptor));
-            printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
+        if (image_number == 0) {
+            cout << "No image files[jpg]" << endl;
+            return;
         }
-        face_descriptors_map[person_name] = std::move(descriptors);
+        else{
+            cout <<"loading pictures..."<<endl;
+            for(const auto & face_img:dataset_pair.second)
+            {
+                cv::Mat face_descriptor = facereco.getFeature(face_img);
+                descriptors.push_back( Statistics::zScore(face_descriptor));
+                cout << "now loading image " << ++img_idx << " out of " << image_number << endl;
+                //printf("\rloading[%.2lf%%]\n",  (++img_idx)*100.0 / (image_number));
+            }
+            face_descriptors_map[person_name] = std::move(descriptors);
+        }
         
     }
 }
@@ -198,12 +209,16 @@ std::string  getClosestFaceDescriptorPersonName(std::map<std::string,cv::Mat> & 
 
     for(const auto & disk_descp:disk_face_descriptors)
     {
+        // cout << "comparing with " << disk_descp.first << endl;
+
         score_[i] = (Statistics::cosineDistance(disk_descp.second, face_descriptor));
+        //cout << "score  " << score_[i] << endl;
         labels.push_back(disk_descp.first);
         i++;
     }
     int maxPosition = max_element(score_.begin(),score_.end()) - score_.begin(); 
     int pos = score_[maxPosition]>face_thre?maxPosition:-1;
+    //cout << "score_[maxPosition] " << score_[maxPosition] << endl;
     std::string person_name = "";
     if(pos>=0)
     {
@@ -274,12 +289,13 @@ int MTCNNDetection()
     Arcface facereco;
 
     // load the dataset and store it inside a dictionary
-    ImageDatasetHandler img_dataset_handler(project_path + "/imgs/");
-    std::map<std::string,std::list<cv::Mat>> dataset_imgs = img_dataset_handler.getDatasetMap();
+    //ImageDatasetHandler img_dataset_handler(project_path + "/imgs/");
+    //std::map<std::string,std::list<cv::Mat>> dataset_imgs = img_dataset_handler.getDatasetMap();
 
-    std::map<std::string,std::list<cv::Mat>> face_descriptors_dict;
-    calculateFaceDescriptorsFromImgDataset(facereco,dataset_imgs,face_descriptors_dict);
-    //calculateFaceDescriptorsFromDisk(facereco,disk_face_descriptors);
+    //std::map<std::string,std::list<cv::Mat>> face_descriptors_dict;
+    std::map<std::string,cv::Mat> face_descriptors_dict;
+    //calculateFaceDescriptorsFromImgDataset(facereco,dataset_imgs,face_descriptors_dict);
+    calculateFaceDescriptorsFromDisk(facereco,face_descriptors_dict);
 
     Live live;
     loadLiveModel(live);
@@ -288,6 +304,7 @@ int MTCNNDetection()
     float threshold[3] = {0.7f, 0.6f, 0.6f};
 
     //ParallelVideoCapture cap("udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! videoconvert ! appsink sync=false",cv::CAP_GSTREAMER,30); //using camera capturing
+    //ParallelVideoCapture cap("/home/pi/testvideo.mp4");
     ParallelVideoCapture cap(0);                    
     cap.startCapture();
 
@@ -311,41 +328,58 @@ int MTCNNDetection()
     std::string liveface;
     float ratio_x = 1;
     float ratio_y = 1;
+    int flag = 0;
+    int record_count = 0;
+    int file_save_count = 0;
 
     while(cap.isOpened())
     {
         frame = cap.getFrame();    
         //cv::resize(frame,frame,cv::Size(300,300));
-
+        //cout << "frame size: " << frame.size() << endl;
         if(frame.empty())
         {
             continue;
         } 
         ++count;
-
+        flag = 0;
         //detect faces
         std::vector<Bbox> faces_info = detect_mtcnn(frame); 
         if(faces_info.size()>=1)
         {
-
+            flag = 1;
             auto large_box = getLargestBboxFromBboxVec(faces_info);
-
+            //cout << "large_box got" << endl;
             LiveFaceBox live_face_box = Bbox2LiveFaceBox(large_box);
             
             cv::Mat aligned_img = alignFaceImage(frame,large_box,face_landmark_gt_matrix);
-
+            //cout << "aligned_img got" << endl;
             cv::Mat face_descriptor = facereco.getFeature(aligned_img);
             // normalize
             face_descriptor = Statistics::zScore(face_descriptor);
-
+            //cout << "face_descriptor created" << endl;
             std::string person_name = getClosestFaceDescriptorPersonName(face_descriptors_dict,face_descriptor);
             
             if(!person_name.empty())
             {
-                cout<<person_name<<"\n";
+                record_count = 0;
+                cout<<person_name<<endl;
             }
             else{
-                cout<<"unknown person"<<"\n";
+                if (record_face){
+                    if (record_count == 10){
+                        record_count = 0;
+                        cout << "recording new face..." << endl;
+                        cout << "input your new face name:"<< endl;
+                        std::string new_name;
+                        std::cin >> new_name;
+                        imwrite(project_path+"/img/"+new_name+"_0.jpg" , aligned_img);
+                        face_descriptors_dict[new_name] = face_descriptor;
+                    }
+                    else record_count++;
+                }
+
+                else cout<<"unknown person"<<"\n";
             }
 
             confidence = live.Detect(frame,live_face_box);
@@ -371,8 +405,17 @@ int MTCNNDetection()
             cv::putText(frame,liveface,cv::Point(15,40),1,2.0,cv::Scalar(255,0,0));
            
         }
-       
-        cv::imshow("img", frame);
+        if (flag == 0)
+        {
+            cout << "no face detected" << endl;
+        }
+        if (file_save_count == 50)
+        {
+            file_save_count = 0;
+            cv::imwrite("/home/pi/LiveFaceReco_RaspberryPi/temp.jpg", frame);
+        }
+        else file_save_count++;
+        
 
         char k = cv::waitKey(33);
     

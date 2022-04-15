@@ -21,6 +21,7 @@ class DescriptorDatasetHandler: public AbstractDatasetHandler<CV_DESCRIPTOR>
 
         void loadDataset()
         {
+            cout << "loading dataset" << endl;
             std::string root_folder = this->root_folder_;
             
             std::vector<std::string> folder_list;
@@ -82,7 +83,8 @@ class DescriptorDatasetHandler: public AbstractDatasetHandler<CV_DESCRIPTOR>
                     file>>descriptor;  
                 }
                 else{
-                        return;
+                    std::cout<<"file "<<filepath<<" not found\n";
+                    return;
                 }
 
         }
@@ -101,15 +103,20 @@ class DescriptorDatasetHandler: public AbstractDatasetHandler<CV_DESCRIPTOR>
 
         void getDescriptorsFromFolder(const std::string folder_path, std::list<DLIB_FLOAT_DESCRIPTOR> & descriptor_list)
         { 
+            cout << "Getting Descriptor" << endl;
+            cout << "folder path " << folder_path << endl;
             for (const auto & file  : std::filesystem::directory_iterator(folder_path))
             {
+                cout << file.path() << endl;
                 if(isExtension(file.path(),"data"))
                 {
+                    cout << "loading data" << file.path() << "\n";
                     DLIB_FLOAT_DESCRIPTOR descriptor;
               
                     loadDescriptor(descriptor,file.path());  
                     descriptor_list.push_back(descriptor);
                 }
+                else cout << "no data file found!" << file.path() << "\n";
             }
         };
       
